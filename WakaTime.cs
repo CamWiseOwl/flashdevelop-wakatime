@@ -28,6 +28,8 @@ namespace WakaTime {
             }
         }
 
+        public delegate void DelegateSendFile(string fileName, string projectName, bool isWrite = false);
+
         public static string LoadApiKey() {
             StringBuilder keyValue = new StringBuilder(255);
             string configFilepath = Utilities.GetConfigFilePath();
@@ -53,7 +55,7 @@ namespace WakaTime {
             if (lastSentFile == fileName) { return; }
 
             Logger.Debug("Event: File Changed");
-            SendFile(fileName, projectName);
+            ThreadedSendFile(fileName, projectName);
             lastSentFile = fileName;
         }
 
@@ -61,13 +63,18 @@ namespace WakaTime {
             if (lastSentTime.AddMinutes(2) <= DateTime.UtcNow) { return; }
 
             Logger.Debug("Event: File Modified");
-            SendFile(fileName, projectName);
+            ThreadedSendFile(fileName, projectName);
             lastSentTime = DateTime.UtcNow;
         }
 
         public static void FileSaved(string fileName, string projectName) {
             Logger.Debug("WakaTime Event: File Saved");
-            SendFile(fileName, projectName, true);
+            ThreadedSendFile(fileName, projectName, true);
+        }
+
+        public static void ThreadedSendFile(string fileName, string projectName, bool isWrite = false) {
+            DelegateSendFile del = new DelegateSendFile(SendFile);
+            del.BeginInvoke(fileName, projectName, isWrite, null, null);
         }
 
         public static void SendFile(string fileName, string projectName, bool isWrite = false) {
@@ -95,8 +102,10 @@ namespace WakaTime {
             try {
                 var proc = Process.Start(procInfo);
                 Logger.Debug("UtilityManager sendFile : " + python + " " + arguments);
-                Logger.Debug("Output:"+proc.StandardOutput.ReadToEnd());
-                Logger.Debug("Error:"+proc.StandardError.ReadToEnd());
+                string output = proc.StandardOutput.ReadToEnd();
+                string error = proc.StandardError.ReadToEnd();
+                if (output.Length > 0) { Logger.Debug("Output:" + output); }
+                if (error.Length > 0) { Logger.Debug("Error:" + error); }
             } catch (InvalidOperationException ex) {
                 Logger.Debug("UtilityManager sendFile : " + python + " " + arguments);
                 Logger.Debug("UtilityManager sendFile : " + ex.Message);

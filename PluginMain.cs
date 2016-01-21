@@ -83,7 +83,7 @@ namespace WakaTime {
                 timer.Stop();
                 timer.Dispose();
 
-                new System.Threading.Thread(onFormLoaded).Start();
+                new System.Threading.Thread(() => onFormLoaded()).Start();
             }
         }
 
