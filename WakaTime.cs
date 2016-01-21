@@ -28,8 +28,6 @@ namespace WakaTime {
             }
         }
 
-        public delegate void DelegateSendFile(string fileName, string projectName, bool isWrite = false);
-
         public static string LoadApiKey() {
             StringBuilder keyValue = new StringBuilder(255);
             string configFilepath = Utilities.GetConfigFilePath();
@@ -55,7 +53,7 @@ namespace WakaTime {
             if (lastSentFile == fileName) { return; }
 
             Logger.Debug("Event: File Changed");
-            ThreadedSendFile(fileName, projectName);
+            SendFile(fileName, projectName);
             lastSentFile = fileName;
         }
 
@@ -63,20 +61,15 @@ namespace WakaTime {
             if (lastSentTime.AddMinutes(2) <= DateTime.UtcNow) { return; }
 
             Logger.Debug("Event: File Modified");
-            ThreadedSendFile(fileName, projectName);
+            SendFile(fileName, projectName);
             lastSentTime = DateTime.UtcNow;
         }
 
         public static void FileSaved(string fileName, string projectName) {
             Logger.Debug("WakaTime Event: File Saved");
-            ThreadedSendFile(fileName, projectName, true);
+            SendFile(fileName, projectName, true);
         }
-
-        public static void ThreadedSendFile(string fileName, string projectName, bool isWrite = false) {
-            DelegateSendFile del = new DelegateSendFile(SendFile);
-            del.BeginInvoke(fileName, projectName, isWrite, null, null);
-        }
-
+        
         public static void SendFile(string fileName, string projectName, bool isWrite = false) {
             string arguments = "\"" + Utilities.GetCLI() + "\" --key=\"" + ApiKey + "\""
                                 + " --file=\"" + fileName + "\""
@@ -96,16 +89,10 @@ namespace WakaTime {
             procInfo.FileName = python;
             procInfo.CreateNoWindow = true;
             procInfo.Arguments = arguments;
-            procInfo.RedirectStandardOutput = true;
-            procInfo.RedirectStandardError = true;
 
             try {
-                var proc = Process.Start(procInfo);
+                Process.Start(procInfo);
                 Logger.Debug("UtilityManager sendFile : " + python + " " + arguments);
-                string output = proc.StandardOutput.ReadToEnd();
-                string error = proc.StandardError.ReadToEnd();
-                if (output.Length > 0) { Logger.Debug("Output:" + output); }
-                if (error.Length > 0) { Logger.Debug("Error:" + error); }
             } catch (InvalidOperationException ex) {
                 Logger.Debug("UtilityManager sendFile : " + python + " " + arguments);
                 Logger.Debug("UtilityManager sendFile : " + ex.Message);

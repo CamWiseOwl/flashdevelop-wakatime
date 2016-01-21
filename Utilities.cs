@@ -96,9 +96,9 @@ namespace WakaTime {
 
         public static string GetPython() {
             string[] locations = {
-                "pythonw",
+                //"pythonw",
                 "python",
-                "\\Python37\\pythonw",
+                /*"\\Python37\\pythonw",
                 "\\Python36\\pythonw",
                 "\\Python35\\pythonw",
                 "\\Python34\\pythonw",
@@ -117,7 +117,7 @@ namespace WakaTime {
                 "\\python31\\pythonw",
                 "\\python30\\pythonw",
                 "\\python27\\pythonw",
-                "\\python26\\pythonw",
+                "\\python26\\pythonw",*/
                 "\\Python37\\python",
                 "\\Python36\\python",
                 "\\Python35\\python",
