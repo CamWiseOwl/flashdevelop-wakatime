@@ -6,17 +6,20 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using ScintillaNet;
+using System.Reflection;
+using System.Diagnostics;
 
 namespace WakaTime {
+    // WakaTime plugin for FlashDevelop
     public class PluginMain : IPlugin {
         private String pluginName = "WakaTime";
         private String pluginGuid = "418dfca2-2210-4ee0-b66a-4574611739bc";
         private String pluginHelp = "www.flashdevelop.org/community/";
         private String pluginDesc = "WakaTime is time tracking for Programmers";
         private String pluginAuth = "Cameron WiseOwl";
-        private ApiKeyDialog dialog;
+        private static String pluginVers = "";
         private Image pluginImage;
-        private UtilityManager utilityManager = UtilityManager.Instance;
+        private APIKeyForm pluginPanel;
 
         #region Required Properties
         public Int32 Api {
@@ -43,81 +46,97 @@ namespace WakaTime {
             get { return this.pluginHelp; }
         }
 
+        public static String Version {
+            get { return pluginVers;  }
+        }
+
         [Browsable(false)]
         public Object Settings {
             get { return new Object(); }
         }
         #endregion
 
+        public void Dispose() { }
         public void Initialize() {
+            // Run basic plugin stuff.
             this.pluginImage = Properties.Resources.wakatime;
-            this.dialog = new ApiKeyDialog();
+            this.pluginPanel = new APIKeyForm();
             ToolStripMenuItem menu = (ToolStripMenuItem)PluginBase.MainForm.FindMenuItem("HelpMenu");
             menu.DropDownItems.Add(new ToolStripMenuItem(this.pluginName, this.pluginImage, new EventHandler(this.OpenPanel)));
-            checkFormLoaded();
-        }
 
-        private void checkFormLoaded() {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            pluginVers = fvi.FileVersion;
+
+            // Then check on interval for the FlashDevelop main form to load
+            // (Is there a better way?)
             Timer timer = new Timer();
             timer.Interval = 100;
-            timer.Tick += timer_Tick;
+            timer.Tick += checkFormLoaded;
             timer.Start();
         }
 
-        private void timer_Tick(object sender, EventArgs e) {
-            // If there's a better way, blame the lack of Docs. But this works pretty nicely.
+        private void checkFormLoaded(object sender, EventArgs e) {
             if (Application.OpenForms.Count > 0) {
-                Timer timer = (Timer) sender;
+                Timer timer = (Timer)sender;
                 timer.Stop();
                 timer.Dispose();
 
-                new System.Threading.Thread(init_Thread).Start();
+                new System.Threading.Thread(onFormLoaded).Start();
             }
         }
 
-        public void init_Thread() {
-            utilityManager.Initialize(this);
+        private void onFormLoaded() {
+            // TODO: Check the Python check works
+            Utilities.CheckPythonInstalled();
+            Utilities.CheckCLIInstalled();
+            WakaTime.LoadApiKey();
+
+            if (WakaTime.ApiKey.IsNullOrWhiteSpace()) {
+                OpenPanel(); // (then on OK add event listeners)
+            } else {
+                // Else add the necessary WakaTime event listeners
+                Utilities.Log("WakaTime: API Key found, is: " + WakaTime.ApiKey);
+                AddEventHandlers();
+            }
         }
 
-        public void Dispose() {}
-
         public void HandleEvent(Object sender, NotifyEvent e, HandlingPriority prority) {
-            Console.WriteLine("Handle event");
             string fileName = PluginBase.MainForm.CurrentDocument.FileName;
+            string projectName = "";
+            if (PluginBase.CurrentProject != null) {
+                projectName = PluginBase.CurrentProject.Name;
+            }
+
             switch (e.Type) {
-                case EventType.FileSwitch: // https://wakatime.com/help/misc/creating-plugin#handling-editor-events File Changed
-                    Logger.Instance.Log("WakaTime Event: File Changed");
-                    // TODO: Send wakatime-cli command
+                case EventType.FileSwitch:
+                    WakaTime.FileChanged(fileName, projectName);
                     break;
 
-                case EventType.FileSave: // https://wakatime.com/help/misc/creating-plugin#handling-editor-events File Saved
-                    Logger.Instance.Log("WakaTime Event: File Saved");
-                    // TODO: Send wakatime-cli command
+                case EventType.FileSave:
+                    WakaTime.FileSaved(fileName, projectName);
                     break;
 
             }
         }
 
         public void AddEventHandlers() {
-            //EventManager.AddEventHandler(this, EventType.FileSwitch | EventType.FileSave);
-            Logger.Instance.Log("ADDINGEVENTLISTENERS");
-            UITools.Manager.OnCharAdded += new UITools.CharAddedHandler(onChar);
-            UITools.Manager.OnTextChanged += new UITools.TextChangedHandler(onTextChanged);
+            UITools.Manager.OnTextChanged += new UITools.TextChangedHandler(this.SciControlTextChanged);
+            EventManager.AddEventHandler(this, EventType.FileSwitch | EventType.FileSave);
         }
-
-        private void onChar(ScintillaControl sender, int value) {
-            Logger.Instance.Log("WakaTime Event: File Modified");
-        }
-
-        private void onTextChanged(ScintillaControl sender, int position, int length, int linesAdded) {
-            Logger.Instance.Log("WakaTime Event: File Modified");
+        private void SciControlTextChanged(ScintillaControl sci, Int32 position, Int32 length, Int32 linesAdded) {
+            string fileName = PluginBase.MainForm.CurrentDocument.FileName;
+            string projectName = PluginBase.CurrentProject.Name;
+            WakaTime.FileModified(fileName, projectName);
         }
 
         public void OpenPanel(Object sender = null, System.EventArgs e = null) {
-            if (dialog.ShowDialog() == DialogResult.OK) {
-                dialog.Hide();
-                Logger.Instance.Log("WakaTime API key set to " + dialog.GetApiText());
-                utilityManager.ApiKey = dialog.GetApiText();
+            pluginPanel.SetApiText(WakaTime.ApiKey);
+
+            if (pluginPanel.ShowDialog() == DialogResult.OK) {
+                pluginPanel.Hide();
+                Utilities.Log("WakaTime API key set to " + pluginPanel.GetApiText());
+                WakaTime.ApiKey = pluginPanel.GetApiText();
             }
         }
     }

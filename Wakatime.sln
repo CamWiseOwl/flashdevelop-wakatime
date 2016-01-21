@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginCore", "..\..\..\Plug
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WakaTime", "WakaTime.csproj", "{418DFCA2-2210-4EE0-B66A-4574611739BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutputPanel", "..\OutputPanel\OutputPanel.csproj", "{EF8EE44C-62B2-4744-85CB-278E1F37D418}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,14 +41,6 @@ Global
 		{418DFCA2-2210-4EE0-B66A-4574611739BC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{418DFCA2-2210-4EE0-B66A-4574611739BC}.Release|x86.ActiveCfg = Release|x86
 		{418DFCA2-2210-4EE0-B66A-4574611739BC}.Release|x86.Build.0 = Release|x86
-		{EF8EE44C-62B2-4744-85CB-278E1F37D418}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EF8EE44C-62B2-4744-85CB-278E1F37D418}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EF8EE44C-62B2-4744-85CB-278E1F37D418}.Debug|x86.ActiveCfg = Debug|x86
-		{EF8EE44C-62B2-4744-85CB-278E1F37D418}.Debug|x86.Build.0 = Debug|x86
-		{EF8EE44C-62B2-4744-85CB-278E1F37D418}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EF8EE44C-62B2-4744-85CB-278E1F37D418}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EF8EE44C-62B2-4744-85CB-278E1F37D418}.Release|x86.ActiveCfg = Release|x86
-		{EF8EE44C-62B2-4744-85CB-278E1F37D418}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

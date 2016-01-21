@@ -10,19 +10,28 @@ using ICSharpCode.SharpZipLib.Zip;
 
 namespace WakaTime {
     class Downloader {
+        private static string pythonURL = "https://www.python.org/ftp/python/3.4.2/python-3.4.2.msi";
+        private static string python64URL = "https://www.python.org/ftp/python/3.4.2/python-3.4.2.amd64.msi";
+        private static string cliURL = "https://github.com/wakatime/wakatime/archive/master.zip";
 
-        // Download the WakaTime CLI
-        public static void DownloadCLI(string url, string installDir) {
+        // Download the WakaTime CLI and Extract it
+        public static void DownloadCLI() {
+            string cliPath = Utilities.GetCLIPath();
             WebClient client = new WebClient();
-            string currentDir = GetCurrentDirectory();
-            string fileToDownload = currentDir + "\\wakatime-cli.zip";
+            string fileToDownload = cliPath + "\\wakatime-cli.zip";
 
-            Logger.Instance.Log("WakaTime: downloading cli, target: " + fileToDownload);
-            client.DownloadFile(url, fileToDownload);
+            Directory.CreateDirectory(cliPath);
+            Utilities.Log("WakaTime: downloading cli, target: " + fileToDownload);
+            try {
+                client.DownloadFile(cliURL, fileToDownload);
+            } catch (WebException ex) {
+                Utilities.Log("WakaTime WebException: " + ex.Message);
+                return;
+            }
 
-            Logger.Instance.Log("WakaTime: extracting cli, target: " + installDir);
-            ExtractZipFile(fileToDownload, installDir);
-            Logger.Instance.Log("WakaTime: cli extracted");
+            Utilities.Log("WakaTime: extracting cli, target: " + cliPath);
+            ExtractZipFile(fileToDownload, cliPath);
+            Utilities.Log("WakaTime: cli extracted");
         }
 
         public static void ExtractZipFile(string zipFile, string outputFolder) {
@@ -31,20 +40,14 @@ namespace WakaTime {
             // Will always overwrite if target filenames already exist
             fastZip.ExtractZip(zipFile, outputFolder, null);
         }
-        
+
         // Download and install Python
-        public static void DownloadPython(string url, string installDir) {
+        public static void DownloadPython(bool x64) {
             string fileToDownload = GetCurrentDirectory() + "\\python.msi";
 
             WebClient client = new WebClient();
-            Logger.Instance.Log("WakaTime: downloading python.msi...");
-            client.DownloadFile(url, fileToDownload);
-
-            string arguments = "/i \"" + fileToDownload + "\"";
-            if (installDir != null) {
-                arguments = arguments + " TARGETDIR=\"" + installDir + "\"";
-            }
-            arguments = arguments + " /norestart /qb!";
+            Utilities.Log("WakaTime: downloading python.msi");
+            client.DownloadFile(x64 ? python64URL : pythonURL, fileToDownload);
 
             ProcessStartInfo procInfo = new ProcessStartInfo();
             procInfo.UseShellExecute = false;
@@ -52,13 +55,13 @@ namespace WakaTime {
             procInfo.RedirectStandardError = true;
             procInfo.FileName = "msiexec";
             procInfo.CreateNoWindow = true;
-            procInfo.Arguments = arguments;
+            procInfo.Arguments = "/i \"" + fileToDownload + "\" /norestart /qb!";
 
-            Logger.Instance.Log("WakaTime: installing python...");
+            Utilities.Log("WakaTime: installing python...");
             var proc = Process.Start(procInfo);
-            Logger.Instance.Log(proc.StandardOutput.ReadToEnd());
-            Logger.Instance.Log(proc.StandardError.ReadToEnd());
-            Logger.Instance.Log("WakaTime: finished installing python.");
+            Utilities.Log(proc.StandardOutput.ReadToEnd());
+            Utilities.Log(proc.StandardError.ReadToEnd());
+            Utilities.Log("WakaTime: finished installing python.");
         }
 
         public static string GetCurrentDirectory() {
