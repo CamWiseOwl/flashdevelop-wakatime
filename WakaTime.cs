@@ -50,26 +50,23 @@ namespace WakaTime {
 
         // https://wakatime.com/help/misc/creating-plugin#handling-editor-events
         public static void FileChanged(string fileName, string projectName) {
-            Utilities.Log("WakaTime Event: File Changed", false);
-            if (lastSentFile != fileName) {
-                SendFile(fileName, projectName);
-            }
+            if (lastSentFile == fileName) { return; }
 
+            Logger.Debug("Event: File Changed");
+            SendFile(fileName, projectName);
             lastSentFile = fileName;
         }
 
         public static void FileModified(string fileName, string projectName) {
-            Utilities.Log("WakaTime Event: File Modified", false);
-            if (lastSentTime.AddMinutes(2) > DateTime.UtcNow) {
-                SendFile(fileName, projectName);
-            }
+            if (lastSentTime.AddMinutes(2) <= DateTime.UtcNow) { return; }
 
+            Logger.Debug("Event: File Modified");
+            SendFile(fileName, projectName);
             lastSentTime = DateTime.UtcNow;
         }
 
         public static void FileSaved(string fileName, string projectName) {
-            Utilities.Log("WakaTime Event: File Saved", false);
-
+            Logger.Debug("WakaTime Event: File Saved");
             SendFile(fileName, projectName, true);
         }
 
@@ -97,15 +94,15 @@ namespace WakaTime {
 
             try {
                 var proc = Process.Start(procInfo);
-                Utilities.Log("UtilityManager sendFile : " + python + " " + arguments, false);
-                Utilities.Log("Output:"+proc.StandardOutput.ReadToEnd(), false);
-                Utilities.Log("Error:"+proc.StandardError.ReadToEnd(), false);
+                Logger.Debug("UtilityManager sendFile : " + python + " " + arguments);
+                Logger.Debug("Output:"+proc.StandardOutput.ReadToEnd());
+                Logger.Debug("Error:"+proc.StandardError.ReadToEnd());
             } catch (InvalidOperationException ex) {
-                Utilities.Log("UtilityManager sendFile : " + python + " " + arguments, false);
-                Utilities.Log("UtilityManager sendFile : " + ex.Message, false);
+                Logger.Debug("UtilityManager sendFile : " + python + " " + arguments);
+                Logger.Debug("UtilityManager sendFile : " + ex.Message);
             } catch (Exception ex) {
-                Utilities.Log("UtilityManager sendFile : " + python + " " + arguments, false);
-                Utilities.Log("UtilityManager sendFile : " + ex.Message, false);
+                Logger.Debug("UtilityManager sendFile : " + python + " " + arguments);
+                Logger.Debug("UtilityManager sendFile : " + ex.Message);
             }
         }
     }

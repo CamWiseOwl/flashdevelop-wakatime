@@ -78,6 +78,7 @@ namespace WakaTime {
 
         private void checkFormLoaded(object sender, EventArgs e) {
             if (Application.OpenForms.Count > 0) {
+                Logger.Debug("FD Main form loaded");
                 Timer timer = (Timer)sender;
                 timer.Stop();
                 timer.Dispose();
@@ -96,7 +97,7 @@ namespace WakaTime {
                 OpenPanel(); // (then on OK add event listeners)
             } else {
                 // Else add the necessary WakaTime event listeners
-                Utilities.Log("WakaTime: API Key found, is: " + WakaTime.ApiKey);
+                Logger.Debug("API Key found, is: " + WakaTime.ApiKey);
                 AddEventHandlers();
             }
         }
@@ -135,7 +136,7 @@ namespace WakaTime {
 
             if (pluginPanel.ShowDialog() == DialogResult.OK) {
                 pluginPanel.Hide();
-                Utilities.Log("WakaTime API key set to " + pluginPanel.GetApiText());
+                Logger.Debug("API key set to " + pluginPanel.GetApiText());
                 WakaTime.ApiKey = pluginPanel.GetApiText();
             }
         }

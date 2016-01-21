@@ -21,17 +21,17 @@ namespace WakaTime {
             string fileToDownload = cliPath + "\\wakatime-cli.zip";
 
             Directory.CreateDirectory(cliPath);
-            Utilities.Log("WakaTime: downloading cli, target: " + fileToDownload);
+            Logger.Log("Downloading cli, target: " + fileToDownload);
             try {
                 client.DownloadFile(cliURL, fileToDownload);
             } catch (WebException ex) {
-                Utilities.Log("WakaTime WebException: " + ex.Message);
+                Logger.Log("WebException: " + ex.Message);
                 return;
             }
 
-            Utilities.Log("WakaTime: extracting cli, target: " + cliPath);
+            Logger.Log("Extracting cli, target: " + cliPath);
             ExtractZipFile(fileToDownload, cliPath);
-            Utilities.Log("WakaTime: cli extracted");
+            Logger.Log("Cli extracted");
         }
 
         public static void ExtractZipFile(string zipFile, string outputFolder) {
@@ -46,7 +46,7 @@ namespace WakaTime {
             string fileToDownload = GetCurrentDirectory() + "\\python.msi";
 
             WebClient client = new WebClient();
-            Utilities.Log("WakaTime: downloading python.msi");
+            Logger.Log("Downloading python.msi");
             client.DownloadFile(x64 ? python64URL : pythonURL, fileToDownload);
 
             ProcessStartInfo procInfo = new ProcessStartInfo();
@@ -57,11 +57,11 @@ namespace WakaTime {
             procInfo.CreateNoWindow = true;
             procInfo.Arguments = "/i \"" + fileToDownload + "\" /norestart /qb!";
 
-            Utilities.Log("WakaTime: installing python...");
+            Logger.Log("Installing python...");
             var proc = Process.Start(procInfo);
-            Utilities.Log(proc.StandardOutput.ReadToEnd());
-            Utilities.Log(proc.StandardError.ReadToEnd());
-            Utilities.Log("WakaTime: finished installing python.");
+            Logger.Debug(proc.StandardOutput.ReadToEnd());
+            Logger.Debug(proc.StandardError.ReadToEnd());
+            Logger.Log("Finished installing python.");
         }
 
         public static string GetCurrentDirectory() {

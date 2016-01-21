@@ -54,33 +54,29 @@ namespace WakaTime {
         // Make sure Python is installed.
         public static void CheckPythonInstalled() {
             if (GetPython() != null) {
-                Log("WakaTime: Python found at " + GetPython(), false);
+                Logger.Debug("Python found at " + GetPython());
                 return;
             }
 
             try {
+                Logger.Debug("Python not found. Downloading");
                 Downloader.DownloadPython(is64BitOperatingSystem);
             } catch (Exception ex) {
-                Log("WakaTime: Python error: " + ex.Message);
+                Logger.Log("Python error: " + ex.Message);
             }
         }
 
         // Make Sure the CLI is installed
         public static void CheckCLIInstalled() {
             if (File.Exists(GetCLI()) == true) {
-                Log("WakaTime: Cli found at " + GetCLI(), false);
+                Logger.Debug("Cli found at " + GetCLI());
                 return;
             }
 
-            Log("WakaTime: CLI not found. Downloading..." + GetCLI() + ", " + File.Exists(GetCLI()));
+            Logger.Debug("CLI not found. Downloading...");
             Downloader.DownloadCLI();
         }
 
-        // Logging method
-        public static void Log(string message, bool shouldTrace = true) {
-            Console.WriteLine(message);
-            if (shouldTrace) { TraceManager.Add(message); }
-        }
 
         // Is it 64 bit Windows?
         // http://stackoverflow.com/questions/336633/how-to-detect-windows-64-bit-platform-with-net
@@ -157,7 +153,7 @@ namespace WakaTime {
                         return location;
                     }
                 } catch (Exception ex) {
-                    Log("WakaTime: Get Python error " + ex.Message);
+                    Logger.Log("Get Python error " + ex.Message);
                 }
             }
             return null;
