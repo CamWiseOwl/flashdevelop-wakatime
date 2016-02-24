@@ -27,6 +27,7 @@ namespace WakaTime.Forms {
                     wakaTimeConfigFile.ApiKey = apiKey.ToString();
                     wakaTimeConfigFile.Save();
                     PluginMain.ApiKey = apiKey.ToString();
+                    Logger.Log("API Key changed.");
                 } else {
                     MessageBox.Show("Please enter valid Api Key.");
                     DialogResult = DialogResult.None; // do not close dialog box

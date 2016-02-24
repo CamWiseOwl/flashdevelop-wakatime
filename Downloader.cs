@@ -8,7 +8,7 @@ using System.Net;
 namespace WakaTime {
     public class Downloader {
         public static void DownloadAndInstallCli() {
-            Logger.Log("Downloading wakatime cli...");
+            Logger.Log("WakaTime CLI Missing, downloading.", true);
 
             string url = WakaTimeConstants.CliUrl;
             string destinationDir = WakaTimeConstants.UserConfigDir;
@@ -23,7 +23,7 @@ namespace WakaTime {
             // Download wakatime cli
             client.DownloadFile(url, localZipFile);
 
-            Logger.Log("Finished downloading wakatime cli.");
+            Logger.Log("Finished downloading wakatime cli.", true);
 
             // Extract wakatime cli zip file
             ExtractZipFile(localZipFile, destinationDir);
@@ -34,7 +34,7 @@ namespace WakaTime {
         }
 
         public static void DownloadAndInstallPython() {
-            Logger.Log("Downloading python...");
+            Logger.Log("No Python install detected. Downloading embedded version.", true);
 
             var url = PythonManager.PythonDownloadUrl;
             var destinationDir = WakaTimeConstants.UserConfigDir;
@@ -54,7 +54,7 @@ namespace WakaTime {
             // Extract wakatime cli zip file
             ExtractZipFile(localFile, Path.Combine(destinationDir, "python"));
 
-            Logger.Log(string.Format("Finished extracting python: {0}", Path.Combine(destinationDir, "python")));
+            Logger.Log(string.Format("Finished extracting python: {0}", Path.Combine(destinationDir, "python")), true);
 
             try {
                 File.Delete(localFile);

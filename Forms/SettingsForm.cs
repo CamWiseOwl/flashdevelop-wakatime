@@ -34,6 +34,7 @@ namespace WakaTime.Forms {
                     wakaTimeConfigFile.Debug = chkDebugMode.Checked;
                     wakaTimeConfigFile.Save();
                     OnConfigSaved();
+                    Logger.Log("API Key changed.");
                 } else {
                     MessageBox.Show(@"Please enter valid Api Key.");
                     DialogResult = DialogResult.None; // do not close dialog box

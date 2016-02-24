@@ -85,7 +85,8 @@ namespace WakaTime {
             this.pluginPanel = new Forms.ApiKeyForm();
 
             // Append API Form to the Help menu
-            ToolStripMenuItem menu = (ToolStripMenuItem)PluginBase.MainForm.FindMenuItem("HelpMenu");
+            ToolStripMenuItem menu = (ToolStripMenuItem)PluginBase.MainForm.FindMenuItem("ToolsMenu");
+            menu.DropDownItems.Add(new ToolStripSeparator());
             menu.DropDownItems.Add(new ToolStripMenuItem(this.pluginName, this.pluginImage, new EventHandler(menuItemCallback)));
 
             // Interval to check mainform loaded
@@ -133,7 +134,7 @@ namespace WakaTime {
                         Downloader.DownloadAndInstallCli();
                     }
                 } catch (WebException ex) {
-                    Logger.Error("Are you behind a proxy? Try setting a proxy in WakaTime Settings with format https://user:pass@host:port. Exception Traceback:", ex);
+                    Logger.Error("Are you behind a proxy? Try setting a proxy in WakaTime Settings with format https://user:pass@host:port. Exception Traceback:", ex, true);
                 }
 
                 if (string.IsNullOrEmpty(ApiKey)) {
@@ -143,9 +144,9 @@ namespace WakaTime {
                 // Setup event handlers
                 AddEventHandlers();
 
-                Logger.Log(string.Format("Finished initializing WakaTime v{0}", WakaTimeConstants.PluginVersion));
+                Logger.Log(string.Format("WakaTime v{0} initialised", WakaTimeConstants.PluginVersion), true);
             } catch (Exception ex) {
-                Logger.Error("Error initializing Wakatime", ex);
+                Logger.Error("Error initialising Wakatime", ex, true);
             }
         }
 
