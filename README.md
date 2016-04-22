@@ -1,20 +1,22 @@
 # flashdevelop-wakatime
 
-WakaTime plugin for FlashDevelop.
+Integrates the time tracking service WakaTime into the IDE FlashDevelop (or HaxeDevelop).
 
 ## Installation
 
-__If writing to Program Files (x86) is protected:__
+__Automatic Installation Using FlashDevelop:__
 
-1. Close FlashDevelop if open
-2. Extract WakaTime.zip to the FD Plugins directory (typically C:\Program Files (x86)\FlashDevelop\Plugins)
-3. Re-open FlashDevelop
+1. Run FlashDevelop
+2. Open the Tools toolbar and click Install Software. A program called Appman opens. 
+3. Scroll down to the Plugins section, check the box next to WakaTime and click Install.
 
-__If not:__
+__Manual Installation:__
 
-1. Open WakaTime.fdz
-2. FlashDevelop will open (if not already) and ask to Extract
-3. Restart FlashDevelop
+1. Close FlashDevelop
+2. Extract the plugin zip file to the FD Plugins directory (typically C:\Program Files (x86)\FlashDevelop\Plugins)
+3. Re-open Flashdevelop
+
+---
 
 4\. Enter API Key if prompted (_if not prompted, you may already have a key stored at ~/WakaTime.cfg. If needs be, enter a new key by clicking Help -> WakaTime_)
 
